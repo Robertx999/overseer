@@ -1,14 +1,16 @@
 <script lang="ts">
-  export let img = undefined;
-  export let title = "";
+	export let src: string | undefined = undefined;
+	export let title = '';
 </script>
 
-<div class="flex flex-col bg-[color:var(--md-sys-color-surface-container)] text-[color:var(--md-sys-color-on-surface)] rounded-3xl w-96 overflow-hidden">
-  {#if img != undefined}
-  <img src={img} class="object-cover overflow-hidden"/>
-  {/if}
-  <div class="p-6 flex flex-col gap-2">
-    <h1 class="text-2xl font-medium">{title}</h1>
-    <slot/>
-  </div>
+<div
+	class="flex min-w-80 max-w-96 flex-col overflow-hidden rounded-2xl bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]"
+>
+	{#if src != undefined}
+		<img {src} alt="" class="overflow-hidden rounded-b-xl object-cover" />
+	{/if}
+	<div class="flex flex-col gap-2 p-6">
+		<p class="text-2xl text-[color:var(--md-sys-color-on-surface)]">{title}</p>
+		<p class="text-sm text-[color:var(--md-sys-color-outline)]"><slot /></p>
+	</div>
 </div>
