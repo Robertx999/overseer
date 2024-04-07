@@ -5,6 +5,7 @@
 	// import '@material/web/switch/switch.js';
 
 	import DatePicker from '$lib/DatePicker.svelte';
+	import { MdList } from '@material/web/all';
 
 	let showDatePicker = false;
 	let input: any;
@@ -19,6 +20,22 @@
 <div
 	class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6"
 >
+	<div>
+		<ul>
+			<li class="flex h-12 items-center justify-center gap-3">
+				Camera 1
+				<md-checkbox></md-checkbox>
+			</li>
+			<li class="flex h-12 items-center justify-center gap-3">
+				Camera 2
+				<md-checkbox></md-checkbox>
+			</li>
+			<li class="flex h-12 items-center justify-center gap-3">
+				Camera 3
+				<md-checkbox></md-checkbox>
+			</li>
+		</ul>
+	</div>
 	<div class="w-96">
 		<md-outlined-text-field
 			value={date}
@@ -40,6 +57,7 @@
 			<md-icon-button
 				toggle
 				on:click={() => {
+					date = input.value;
 					if (showDatePicker == false) {
 						input.focus();
 					} else {

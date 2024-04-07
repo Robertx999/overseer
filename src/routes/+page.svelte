@@ -4,20 +4,19 @@
 	// import '@material/web/checkbox/checkbox.js';
 	// import '@material/web/switch/switch.js';
 
+	let paths: string[] = ['./src/lib/uploads/808718.jpg'];
+
 	import Card from '$lib/Card.svelte';
 </script>
 
 <div
 	class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6"
 >
-	<Card
-		title="An Image"
-		src={'https://images.unsplash.com/photo-1710170600419-9771180c5dc1?q=80&w=1884&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}
-	>
-		Just an ordinary image.
-	</Card>
+	{#each paths as path}
+		<Card title={path} src={path}>Just an ordinary image.</Card>
+	{/each}
 
 	<!-- {#each paths as path}
-<Card title={path} src={path}></Card>
-{/each} -->
+		<Card title={path} src={path}></Card>
+	{/each} -->
 </div>

@@ -1,6 +1,11 @@
 <script lang="ts">
 	export let darkMode: boolean;
 	export let currentPath: string;
+
+	function switchDarkMode(e: Event) {
+		let { selected } = e.target as unknown as { selected: boolean };
+		darkMode = selected;
+	}
 </script>
 
 <div
@@ -10,7 +15,7 @@
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<md-fab
-			variant="tertiary"
+			variant="secondary"
 			on:click={() => {
 				window.location.reload();
 			}}
@@ -23,13 +28,13 @@
 			<a href="/" class="destination flex h-14 w-full flex-col items-center justify-start gap-1">
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-secondary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
 						'/'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
 					/>
 					<md-icon
-						class="z-10 text-[color:var(--md-sys-color-on-secondary-container)] {currentPath == '/'
+						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath == '/'
 							? 'filled'
 							: 'empty'}"
 					>
@@ -47,7 +52,7 @@
 			>
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-secondary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
 						'/gallery'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
@@ -72,7 +77,7 @@
 			>
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-secondary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
 						'/upload'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
@@ -91,6 +96,31 @@
 					>Upload</span
 				>
 			</a>
+			<a
+				href="/settings"
+				class="destination flex h-14 w-full flex-col items-center justify-start gap-1"
+			>
+				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
+					<div
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
+						'/settings'
+							? 'w-full opacity-100'
+							: 'w-0 opacity-0'}"
+					/>
+					<md-icon
+						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath ==
+						'/settings'
+							? 'filled'
+							: 'empty'}"
+					>
+						settings
+					</md-icon>
+				</div>
+				<span
+					class=" text-xs font-medium leading-4 tracking-widest text-[color:var(--md-sys-color-on-surface-variant)]"
+					>Settings</span
+				>
+			</a>
 		</div>
 		<!-- <form
 			bind:this={form}
@@ -106,9 +136,7 @@
 	</div>
 	<div class="mb-5 flex w-full">
 		<md-outlined-icon-button
-			on:change={() => {
-				darkMode = !darkMode;
-			}}
+			on:change={switchDarkMode}
 			selected={darkMode ? true : null}
 			toggle
 			class="mx-auto"

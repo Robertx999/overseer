@@ -19,9 +19,8 @@
 </script>
 
 <div
-	class="{darkMode
-		? 'dark'
-		: 'light'} flex flex-row overflow-hidden bg-[color:var(--md-sys-color-background)]"
+	class="{darkMode ? 'dark' : 'light'} 
+	flex flex-row overflow-hidden bg-[color:var(--md-sys-color-background)] text-[color:var(--md-sys-color-on-surface)]"
 >
 	<NavRail bind:darkMode currentPath={data.url}></NavRail>
 
