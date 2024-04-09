@@ -49,7 +49,6 @@
 			bind:this={input}
 			label="Date"
 			type="date"
-			supporting-text="dd.mm.rrrr"
 			has-trailing-icon="true"
 		>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->

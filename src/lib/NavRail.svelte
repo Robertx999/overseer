@@ -17,7 +17,7 @@
 		<md-fab
 			variant="secondary"
 			on:click={() => {
-				window.location.reload();
+				history.go(0);
 			}}
 			class="mx-auto"
 			aria-label="Edit"
