@@ -4,7 +4,7 @@ export async function load({
 	fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
 }) {
 	const res = await fetch('/getimglist.php');
-	let json: { status: string; paths?: [] } = { status: '' };
+	let json: { status: string; paths: [] } = { status: '', paths: [] };
 	await res
 		.json()
 		.then((result) => {

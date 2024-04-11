@@ -10,17 +10,43 @@
 
 	import '@material/web/all.js';
 	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	export let data;
 
 	export const ssr = false;
 	export const prerender = true;
 
-	let darkMode = true;
+	let darkMode = writable(true);
+
+	// darkMode.set(
+	// 	Boolean(
+	// 		parseInt(
+	// 			document.cookie
+	// 				.split('; ')
+	// 				.reduce((prev, curr) => (prev.split('=')[0] == 'dark_mode' ? prev : curr))
+	// 		)
+	// 	)
+	// );
+
+	darkMode.set(
+		Boolean(
+			parseInt(
+				document.cookie
+					.split('; ')
+					.reduce((prev, curr) => (prev.split('=')[0] == 'dark_mode' ? prev : curr))
+					.split('=')[1]
+			)
+		)
+	);
+
+	darkMode.subscribe((value) => {
+		document.cookie = `dark_mode=${Number(value)}`;
+	});
 </script>
 
 <div
-	class="{darkMode ? 'dark' : 'light'} 
+	class="{$darkMode ? 'dark' : 'light'} 
 	flex flex-row overflow-hidden bg-[color:var(--md-sys-color-background)] text-[color:var(--md-sys-color-on-surface)]"
 >
 	<NavRail bind:darkMode currentPath={data.url}></NavRail>

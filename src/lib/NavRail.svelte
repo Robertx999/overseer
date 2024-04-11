@@ -1,10 +1,12 @@
 <script lang="ts">
-	export let darkMode: boolean;
+	import type { Writable } from 'svelte/store';
+
+	export let darkMode: Writable<boolean>;
 	export let currentPath: string;
 
 	function switchDarkMode(e: Event) {
 		let { selected } = e.target as unknown as { selected: boolean };
-		darkMode = selected;
+		darkMode.set(selected);
 	}
 </script>
 
@@ -137,7 +139,7 @@
 	<div class="mb-5 flex w-full">
 		<md-outlined-icon-button
 			on:change={switchDarkMode}
-			selected={darkMode ? true : null}
+			selected={$darkMode ? true : null}
 			toggle
 			class="mx-auto"
 		>
