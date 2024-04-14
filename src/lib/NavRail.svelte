@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
+	import { mobileFilterOpen } from '$lib';
+
 	export let darkMode: Writable<boolean>;
 	export let currentPath: string;
 
@@ -17,18 +19,52 @@
 	<div
 		class="relative flex w-full flex-row-reverse gap-10 max-md:items-center md:mt-[18px] md:flex-col"
 	>
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<md-fab
-			variant="secondary"
-			on:click={() => {
-				history.go(0);
-			}}
-			class="bottom-[calc(88px+1rem)] right-4 mx-auto max-md:absolute"
-			aria-label="Edit"
+		<div
+			class="bottom-[calc(88px+1.5rem)] right-6 mx-auto flex flex-col items-end gap-4 max-md:absolute"
 		>
-			<md-icon slot="icon">refresh</md-icon>
-		</md-fab>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			{#if currentPath == '/gallery'}
+				<md-fab
+					variant="tertiary"
+					on:click={() => {
+						mobileFilterOpen.set(true);
+					}}
+					class="md:hidden"
+					aria-label="Filter"
+					size="small"
+				>
+					<md-icon slot="icon">filter_list</md-icon>
+				</md-fab>
+			{/if}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			{#if currentPath != '/settings'}
+				<md-fab
+					label="Refresh"
+					variant="primary"
+					on:click={() => {
+						history.go(0);
+					}}
+					aria-label="Edit"
+					class="md:hidden"
+				>
+					<md-icon slot="icon">refresh</md-icon>
+				</md-fab>
+			{/if}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<md-fab
+				variant="primary"
+				on:click={() => {
+					history.go(0);
+				}}
+				aria-label="Edit"
+				class="max-md:hidden"
+			>
+				<md-icon slot="icon">refresh</md-icon>
+			</md-fab>
+		</div>
 		<div class="flex flex-row justify-around gap-4 max-md:w-full md:flex-col">
 			<a
 				href="/"

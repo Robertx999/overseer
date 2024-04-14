@@ -1,11 +1,12 @@
 <script lang="ts">
 	import DatePicker from '$lib/DatePicker.svelte';
-	import type { MdRadio } from '@material/web/all';
 	import { writable, type Writable } from 'svelte/store';
+	import { fly } from 'svelte/transition';
+
+	import { mobileFilterOpen, camAliases } from '$lib';
 
 	let showDatePicker = false;
 	let input: any;
-	let date: string = '';
 	let lastValue = '';
 
 	export let camNums: number[];
@@ -14,7 +15,9 @@
 	export let selectedDate: Writable<string>;
 
 	function preventDefault(e: Event) {
-		e.preventDefault();
+		if (innerWidth > 768) {
+			e.preventDefault();
+		}
 	}
 
 	function onCheck({ target }: Event) {
@@ -24,10 +27,16 @@
 			}
 		}
 	}
+
+	let innerWidth: number;
 </script>
 
+<svelte:window bind:innerWidth />
+
 <div
-	class="flex h-screen shrink-0 grow-0 flex-col items-center justify-start gap-6 border-l border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] p-6"
+	in:fly={{ y: 10, duration: 300, delay: 100 }}
+	out:fly={{ y: 0, duration: 100 }}
+	class="flex shrink-0 grow-0 flex-col items-center justify-start gap-6 bg-[color:var(--md-sys-color-surface-container)] p-6 max-md:rounded-3xl md:h-screen md:border-l md:border-[color:var(--md-sys-color-outline-variant)]"
 >
 	<div role="radiogroup" aria-labelledby="group-title" class="flex min-w-full flex-col gap-6">
 		<div class="flex items-center gap-4">
@@ -45,13 +54,16 @@
 					aria-label="First"
 					checked={$camChecked == cam_num ? true : null}
 				/>
-				<label for="first-radio">{cam_num}</label>
+				<label for="first-radio"
+					>{$camAliases.get(cam_num) ? $camAliases.get(cam_num) : 'Camera ' + cam_num}</label
+				>
 			</div>
 		{/each}
 	</div>
 	<md-divider />
 	<div class="min-w-full">
 		<md-outlined-text-field
+			class="w-56"
 			value={$selectedDate}
 			on:focus={() => {
 				showDatePicker = true;
@@ -67,35 +79,65 @@
 		>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<md-icon-button
-				toggle
-				on:click={() => {
-					selectedDate.set(input.value);
-					if (showDatePicker == false) {
-						input.focus();
-					} else {
-						input.blur();
-					}
-				}}
-				on:mousedown={preventDefault}
-				selected={showDatePicker ? true : null}
-				slot="trailing-icon"
-			>
-				<md-icon>calendar_today</md-icon>
-			</md-icon-button>
+			{#if innerWidth > 768}
+				<md-icon-button
+					toggle
+					on:click={() => {
+						selectedDate.set(input.value);
+						if (showDatePicker == false) {
+							input.focus();
+						} else {
+							input.blur();
+						}
+					}}
+					on:mousedown={preventDefault}
+					selected={showDatePicker ? true : null}
+					slot="trailing-icon"
+				>
+					<md-icon>calendar_today</md-icon>
+				</md-icon-button>
+			{/if}
 		</md-outlined-text-field>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<div class=" relative top-4 {showDatePicker ? '' : 'hidden'}" on:mousedown={preventDefault}>
-			<DatePicker
-				bind:value={$selectedDate}
-				onCancelClick={() => {
-					input.blur();
-					input.value = lastValue;
-				}}
-				onOKClick={() => {
-					input.blur();
-				}}
-			/>
-		</div>
+		{#if showDatePicker && innerWidth > 768}
+			<div class=" relative top-4" on:mousedown={preventDefault}>
+				<DatePicker
+					bind:value={$selectedDate}
+					onCancelClick={() => {
+						input.blur();
+						input.value = lastValue;
+					}}
+					onOKClick={() => {
+						input.blur();
+					}}
+				/>
+			</div>
+		{/if}
 	</div>
+	{#if innerWidth <= 768}
+		<div class="flex min-w-full flex-row items-center justify-end gap-2">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<md-text-button
+				on:click={() => {
+					input.value = lastValue;
+					input.blur();
+					mobileFilterOpen.set(false);
+				}}
+			>
+				Cancel
+			</md-text-button>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<md-text-button
+				on:click={() => {
+					selectedDate.set(input.value);
+					input.blur();
+					mobileFilterOpen.set(false);
+				}}
+			>
+				OK
+			</md-text-button>
+		</div>
+	{/if}
 </div>

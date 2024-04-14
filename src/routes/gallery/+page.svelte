@@ -5,6 +5,8 @@
 	import Card from '$lib/Card.svelte';
 	import GalleryFilter from '$lib/GalleryFilter.svelte';
 
+	import { mobileFilterOpen, camAliases } from '$lib';
+
 	export let data;
 
 	let camChecked = writable(0);
@@ -82,52 +84,38 @@
 			);
 		});
 	});
+
+	let innerWidth: number;
 </script>
 
-<div class="max-md:hidden">
-	<GalleryFilter camNums={cam_nums} bind:selectedDate bind:camChecked />
-</div>
-<div class="overflow-y-scroll">
+<svelte:window bind:innerWidth />
+
+{#if $mobileFilterOpen || innerWidth >= 768}
+	<div
+		class="z-30 max-md:absolute max-md:left-1/2 max-md:top-1/2 max-md:-translate-x-1/2 max-md:-translate-y-1/2"
+	>
+		<GalleryFilter camNums={cam_nums} bind:selectedDate bind:camChecked />
+	</div>
+{/if}
+
+<div class="w-full flex-col overflow-y-auto">
+	<div class="md:round bg-[color:var(--md-sys-color-surface-container)]">
+		<div class="flex flex-col p-6 text-xl">
+			<div>
+				{$camAliases.get($camChecked) ? $camAliases.get($camChecked) : 'Camera ' + $camChecked}
+			</div>
+			{#if $selectedDate}
+				<div class="text-sm text-[color:var(--md-sys-color-outline)]">{$selectedDate}</div>
+			{/if}
+		</div>
+	</div>
 	<div
 		class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6 p-6"
 	>
 		{#if query_response}
 			{#each $query_response as cam}
-				<Card title="Camera no.{cam.cam_num}" src={cam.path}>
-					{cam.date.toLocaleString()}
-				</Card>
+				<Card title={cam.date.toLocaleTimeString()} src={cam.path}></Card>
 			{/each}
 		{/if}
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<Card title="Camera no.0"></Card>
-		<!-- {#each paths as path}
-		<Card title={path} src={path}></Card>
-	{/each} -->
 	</div>
 </div>

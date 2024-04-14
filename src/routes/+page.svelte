@@ -6,6 +6,8 @@
 
 	import Card from '$lib/Card.svelte';
 
+	import { camAliases } from '$lib';
+
 	export let data;
 
 	function dataFromPathName(path: string) {
@@ -56,11 +58,16 @@
 </script>
 
 <div
-	class="flex min-h-full min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6 p-6"
+	class="flex h-fit min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6 p-6"
 >
 	{#if newest}
 		{#each newest as cam}
-			<Card title="Camera no.{cam.cam_num}" src={cam.path}>
+			<Card
+				title={$camAliases.get(cam.cam_num)
+					? $camAliases.get(cam.cam_num)
+					: 'Camera ' + cam.cam_num}
+				src={cam.path}
+			>
 				{cam.date}
 			</Card>
 		{/each}

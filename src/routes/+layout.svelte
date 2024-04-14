@@ -1,8 +1,7 @@
 <script lang="ts">
 	import '../app.pcss';
 
-	import { fly } from 'svelte/transition';
-	import { writable, type Writable } from 'svelte/store';
+	import { fly, fade } from 'svelte/transition';
 
 	import NavRail from '$lib/NavRail.svelte';
 
@@ -12,8 +11,8 @@
 	import '@material/web/all.js';
 	import { onMount } from 'svelte';
 
-	import * as app from '$lib/index';
-	let darkMode = app.darkMode;
+	import * as app from '$lib';
+	let { darkMode, mobileFilterOpen } = app;
 
 	export let data;
 
@@ -33,7 +32,11 @@
 			document.cookie = `dark_mode=${Number(value)}`;
 		});
 	});
+
+	let innerWidth: number;
 </script>
+
+<svelte:window bind:innerWidth />
 
 <div
 	class="{$darkMode ? 'dark' : 'light'} 
@@ -52,6 +55,18 @@
 			</div>
 		{/key}
 	</div>
+	{#if $mobileFilterOpen && innerWidth < 768}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			in:fade={{ duration: 300, delay: 100 }}
+			out:fade={{ duration: 100 }}
+			on:click={() => {
+				mobileFilterOpen.set(false);
+			}}
+			class="absolute z-20 flex h-full w-full bg-black/50"
+		/>
+	{/if}
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 </div>
