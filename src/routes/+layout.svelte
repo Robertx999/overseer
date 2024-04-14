@@ -12,7 +12,7 @@
 	import { onMount } from 'svelte';
 
 	import * as app from '$lib';
-	let { darkMode, mobileFilterOpen } = app;
+	let { darkMode, mobileFilterOpen, camAliases } = app;
 
 	export let data;
 
@@ -25,6 +25,14 @@
 						.reduce((prev, curr) => (prev.split('=')[0] == 'dark_mode' ? prev : curr))
 						.split('=')[1]
 				)
+			)
+		);
+		camAliases.set(
+			new Map(
+				document.cookie
+					.split('; ')
+					.filter((value) => /cam\d=.*/.test(value))
+					.map((value) => [parseInt(value.split('=')[0].at(-1) as string), value.split('=')[1]])
 			)
 		);
 

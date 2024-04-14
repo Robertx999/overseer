@@ -34,8 +34,8 @@
 <svelte:window bind:innerWidth />
 
 <div
-	in:fly={{ y: 10, duration: 300, delay: 100 }}
-	out:fly={{ y: 0, duration: 100 }}
+	in:fly={innerWidth <= 768 ? { y: 10, duration: 300, delay: 100 } : { y: 0, duration: 0 }}
+	out:fly={innerWidth <= 768 ? { y: 0, duration: 100 } : { y: 0, duration: 0 }}
 	class="flex shrink-0 grow-0 flex-col items-center justify-start gap-6 bg-[color:var(--md-sys-color-surface-container)] p-6 max-md:rounded-3xl md:h-screen md:border-l md:border-[color:var(--md-sys-color-outline-variant)]"
 >
 	<div role="radiogroup" aria-labelledby="group-title" class="flex min-w-full flex-col gap-6">

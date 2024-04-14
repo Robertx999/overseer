@@ -43,14 +43,6 @@
 	});
 
 	onMount(() => {
-		camAliases.set(
-			new Map(
-				document.cookie
-					.split('; ')
-					.filter((value) => /cam\d=.*/.test(value))
-					.map((value) => [parseInt(value.split('=')[0].at(-1) as string), value.split('=')[1]])
-			)
-		);
 		camAliases.subscribe((map) => {
 			map.forEach((value, key) => {
 				document.cookie = `cam${key}=${value}`;
