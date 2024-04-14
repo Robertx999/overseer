@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
 	export let darkMode: Writable<boolean>;
@@ -11,9 +12,11 @@
 </script>
 
 <div
-	class="flex h-screen w-[88px] shrink-0 grow-0 flex-col justify-between border-r-0 border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)]"
+	class="z-10 flex h-[88px] w-[88px] shrink-0 grow-0 flex-row justify-between border-r-0 border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] max-md:w-screen md:h-screen md:flex-col"
 >
-	<div class="mt-[18px] flex w-full flex-col gap-10">
+	<div
+		class="relative flex w-full flex-row-reverse gap-10 max-md:items-center md:mt-[18px] md:flex-col"
+	>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<md-fab
@@ -21,107 +24,67 @@
 			on:click={() => {
 				history.go(0);
 			}}
-			class="mx-auto"
+			class="bottom-[calc(88px+1rem)] right-4 mx-auto max-md:absolute"
 			aria-label="Edit"
 		>
 			<md-icon slot="icon">refresh</md-icon>
 		</md-fab>
-		<div class="flex flex-col gap-4">
-			<a href="/" class="destination flex h-14 w-full flex-col items-center justify-start gap-1">
+		<div class="flex flex-row justify-around gap-4 max-md:w-full md:flex-col">
+			<a
+				href="/"
+				class="destination flex h-14 w-full max-w-[88px] flex-col items-center justify-start gap-1 {currentPath ==
+				'/'
+					? 'text-[color:var(--md-sys-color-on-surface)]'
+					: 'text-[color:var(--md-sys-color-on-surface-variant)]'}"
+			>
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-[200ms] ease-in-out {currentPath ==
 						'/'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
 					/>
-					<md-icon
-						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath == '/'
-							? 'filled'
-							: 'empty'}"
-					>
-						home
-					</md-icon>
+					<md-icon class="z-10 {currentPath == '/' ? 'filled' : 'empty'}"> home </md-icon>
 				</div>
-				<span
-					class=" text-xs font-medium leading-4 tracking-widest text-[color:var(--md-sys-color-on-surface)]"
-					>Home</span
-				>
+				<span class=" text-xs font-medium leading-4 tracking-widest">Home</span>
 			</a>
 			<a
 				href="/gallery"
-				class="destination flex h-14 w-full flex-col items-center justify-start gap-1"
+				class="destination flex h-14 w-full max-w-[88px] flex-col items-center justify-start gap-1 {currentPath ==
+				'/gallery'
+					? 'text-[color:var(--md-sys-color-on-surface)]'
+					: 'text-[color:var(--md-sys-color-on-surface-variant)]'}"
 			>
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-[200ms] ease-in-out {currentPath ==
 						'/gallery'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
 					/>
-					<md-icon
-						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath ==
-						'/gallery'
-							? 'filled'
-							: 'empty'}"
-					>
-						image
-					</md-icon>
+					<md-icon class="z-10 {currentPath == '/gallery' ? 'filled' : 'empty'}"> image </md-icon>
 				</div>
-				<span
-					class=" text-xs font-medium leading-4 tracking-widest text-[color:var(--md-sys-color-on-surface-variant)]"
-					>Gallery</span
-				>
-			</a>
-			<a
-				href="/upload"
-				class="destination flex h-14 w-full flex-col items-center justify-start gap-1"
-			>
-				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
-					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
-						'/upload'
-							? 'w-full opacity-100'
-							: 'w-0 opacity-0'}"
-					/>
-					<md-icon
-						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath ==
-						'/upload'
-							? 'filled'
-							: 'empty'}"
-					>
-						upload
-					</md-icon>
-				</div>
-				<span
-					class=" text-xs font-medium leading-4 tracking-widest text-[color:var(--md-sys-color-on-surface-variant)]"
-					>Upload</span
-				>
+				<span class=" text-xs font-medium leading-4 tracking-widest">Gallery</span>
 			</a>
 			<a
 				href="/settings"
-				class="destination flex h-14 w-full flex-col items-center justify-start gap-1"
+				class="destination flex h-14 w-full max-w-[88px] flex-col items-center justify-start gap-1 {currentPath ==
+				'/settings'
+					? 'text-[color:var(--md-sys-color-on-surface)]'
+					: 'text-[color:var(--md-sys-color-on-surface-variant)]'}"
 			>
 				<div class="indicator relative flex h-8 w-14 items-center justify-center rounded-full">
 					<div
-						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-300 {currentPath ==
+						class="absolute h-full rounded-full bg-[color:var(--md-sys-color-primary-container)] transition-all duration-[200ms] ease-in-out {currentPath ==
 						'/settings'
 							? 'w-full opacity-100'
 							: 'w-0 opacity-0'}"
 					/>
-					<md-icon
-						class="z-10 text-[color:var(--md-sys-color-on-surface-variant)] {currentPath ==
-						'/settings'
-							? 'filled'
-							: 'empty'}"
-					>
+					<md-icon class="z-10 {currentPath == '/settings' ? 'filled' : 'empty '}">
 						settings
 					</md-icon>
 				</div>
-				<span
-					class=" text-xs font-medium leading-4 tracking-widest text-[color:var(--md-sys-color-on-surface-variant)]"
-					>Settings</span
-				>
+				<span class=" text-xs font-medium leading-4 tracking-widest">Settings</span>
 			</a>
 		</div>
 		<!-- <form
@@ -136,7 +99,7 @@
 			<input class="absolute mt-16" name="imageFile" type="file" />
 		</form> -->
 	</div>
-	<div class="mb-5 flex w-full">
+	<div class="mb-5 flex w-full max-md:hidden">
 		<md-outlined-icon-button
 			on:change={switchDarkMode}
 			selected={$darkMode ? true : null}
@@ -154,10 +117,10 @@
 		background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
 	}
 	.filled {
-		animation: fill 300ms 1 forwards;
+		animation: fill 200ms 1 forwards ease-in-out;
 	}
 	.empty {
-		animation: empty 300ms 1 forwards;
+		animation: empty 200ms 1 forwards ease-in-out;
 	}
 	@keyframes fill {
 		0% {

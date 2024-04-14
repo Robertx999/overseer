@@ -1,0 +1,14 @@
+{
+	"name": "Gallery",
+	"description": "Esp32-cam gallery",
+	"display": "standalone",
+	"start_url": "/",
+	"icons": [
+		{
+			"src": "favicon.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	]
+}

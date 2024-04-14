@@ -6,7 +6,9 @@
 </script>
 
 <script lang="ts">
-	export let value = iso(new Date());
+	import { writable } from 'svelte/store';
+
+	export let value = '';
 	export let days = 'S|M|T|W|T|F|S'.split('|');
 	export let months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|');
 	export let start = 0; // first day of the week (0 = Sunday, 1 = Monday)
@@ -15,6 +17,8 @@
 	export let onCancelClick = () => {};
 
 	let date = iso(new Date());
+	let selected = writable(false);
+	const today = iso(new Date());
 
 	$: acceptDate(value);
 
@@ -34,6 +38,8 @@
 		date = newValue;
 		value = newValue;
 		offset = 0;
+		selected.set(true);
+		weeks = weeksFrom(viewDate, date, start);
 	}
 
 	$: viewDate = viewDateFrom(date, offset);
@@ -75,8 +81,9 @@
 				date: dd,
 				value,
 				class: [
-					date === value ? 'selected' : '',
-					mm == M ? '' : (mm > M ? yy >= Y : yy > Y) ? 'future' : 'past'
+					date === value && $selected ? 'selected' : '',
+					mm == M ? '' : (mm > M ? yy >= Y : yy > Y) ? 'future' : 'past',
+					today === value ? 'today' : ''
 				].join(' ')
 			});
 
@@ -92,7 +99,7 @@
 	}
 </script>
 
-<div class="absolute w-[360px] rounded-2xl bg-[color:var(--md-sys-color-surface-container-high)]">
+<div class="absolute z-10 rounded-2xl bg-[color:var(--md-sys-color-surface-container-high)]">
 	<div
 		class="flex h-16 flex-row items-center justify-around text-[color:var(--md-sys-color-on-surface-variant)]"
 	>
@@ -108,7 +115,7 @@
 			<md-icon>chevron_right</md-icon>
 		</div>
 	</div>
-	<div class="px-3 text-[color:var(--md-sys-color-on-surface)]">
+	<div class="px-3 font-normal text-[color:var(--md-sys-color-on-surface)]">
 		<div class="flex h-12 flex-row items-center justify-center">
 			{#each days as day}
 				<div class="flex h-full min-w-12 items-center justify-center">
@@ -149,6 +156,13 @@
 	.future span {
 		color: var(--md-sys-color-outline);
 		opacity: 0.8;
+	}
+	.today div {
+		border-color: var(--md-sys-color-primary);
+		border-width: 1px;
+	}
+	.today span {
+		color: var(--md-sys-color-primary);
 	}
 	.selected div {
 		background: var(--md-sys-color-primary) !important;

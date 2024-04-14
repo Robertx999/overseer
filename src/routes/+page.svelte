@@ -44,21 +44,19 @@
 	cam_nums.forEach((num) => {
 		newest.push(
 			parsed_paths
-				.filter((el) => el.cam_num == cam_nums[num])
+				.filter((el) => el.cam_num == num)
 				.reduce(
 					(prev, curr) => {
 						return prev.timestamp > curr.timestamp ? prev : curr;
 					},
-					{ cam_num: 0, timestamp: 0, date: '', path: '' }
+					{ cam_num: num, timestamp: 0, date: '', path: '' }
 				)
 		);
 	});
-
-	console.log(newest);
 </script>
 
 <div
-	class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6"
+	class="flex min-h-full min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6 p-6"
 >
 	{#if newest}
 		{#each newest as cam}

@@ -8,7 +8,7 @@ const config = {
 
 	plugins: [],
 
-  darkMode: 'selector'
+	darkMode: 'selector'
 };
 
 module.exports = config;

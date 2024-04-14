@@ -6,11 +6,15 @@
 </script>
 
 <div
-	class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6"
+	class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-3 p-6"
 >
-	<form action="upload.php" method="post" enctype="multipart/form-data" target="dummyframe">
-		Select image to upload:
-		<input type="file" name="imageFile" />
-		<input type="submit" value="Upload Image" name="submit" />
-	</form>
+	<div
+		class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6"
+	>
+		<form action="upload.php" method="post" enctype="multipart/form-data" target="dummyframe">
+			Select image to upload:
+			<input type="file" name="imageFile" />
+			<input type="submit" value="Upload Image" name="submit" />
+		</form>
+	</div>
 </div>
