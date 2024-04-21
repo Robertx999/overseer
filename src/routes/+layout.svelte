@@ -18,15 +18,13 @@
 
 	export let data;
 
-	let image = '';
-
 	onMount(() => {
 		if (browser) {
-			const socket = new WebSocket('ws://192.168.50.41:3109');
+			const socket = new WebSocket('ws://192.168.50.38:3109');
 
 			socket.onmessage = ({ data }) => {
 				console.log(data);
-				image = 'data:image/jpeg;base64,' + data;
+				// image = 'data:image/jpeg;base64,' + data;
 			};
 		}
 		darkMode.set(
@@ -63,8 +61,6 @@
 	flex h-screen w-screen flex-col-reverse overflow-hidden bg-[color:var(--md-sys-color-background)] text-[color:var(--md-sys-color-on-surface)] md:flex-row"
 >
 	<NavRail bind:darkMode currentPath={data.url}></NavRail>
-
-	<span></span>
 
 	<div class="relative flex h-full w-full flex-row">
 		{#key data.url}

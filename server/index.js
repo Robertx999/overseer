@@ -4,64 +4,100 @@ import { WebSocketServer } from 'ws';
 import fs from 'node:fs';
 import { handler } from '../build/handler.js';
 
+////////////////////////// CONFIG //////////////////////////
+const host = '';
 const port = 80;
 const ws_port = 3109;
+const uploadsDir = './server/uploads/';
+////////////////////////////////////////////////////////////
+
 const app = express();
 const server = createServer(app);
 
 const wsServer = new WebSocketServer({ port: ws_port });
 
 wsServer.on('connection', (socket, req) => {
-	let command,
-		mac = undefined;
+	let mac = '';
 	socket.on('message', (message) => {
 		// socket.send(message);
-		if (command == 'mac') {
-			console.log(req.socket.remoteAddress);
-			console.log(message.toString());
-			mac = message.toString();
-		}
-		if (command == 'pic' && mac != undefined) {
-			fs.writeFile(`./server/uploads/${Date.now()}-${mac}`, message, 'binary', function (err) {
-				if (err) throw err;
-				console.log('File saved.');
+		let header = message.slice(0, 3).toString();
+		if (header == 'mac') {
+			// console.log(req.socket.remoteAddress);
+			// console.log(message.toString());
+			mac = message.slice(3).toString();
+			console.log(mac);
+		} else if (/^[0-9A-Fa-f]{12}$/.test(mac)) {
+			// console.log(message.slice(3, 20));
+			let dirPath = uploadsDir + mac.replaceAll(':', '');
+			fs.stat(dirPath, (err, stats) => {
+				if (!stats.isDirectory()) {
+					fs.mkdir(dirPath, (err) => {
+						if (err) throw err;
+					});
+				}
 			});
+			fs.writeFile(
+				dirPath + '/' + Date.now() + '.jpg',
+				message,
+				{ encoding: 'binary', flag: 'w' },
+				(err) => {
+					if (err) throw err;
+					console.log('File saved.');
+				}
+			);
+		} else {
+			socket.send('mac');
 		}
 	});
-	command = 'mac';
-	socket.send(command);
-	command = 'pic';
-	socket.send(command);
+	socket.send('mac');
 	setInterval(() => {
-		command = 'pic';
-		socket.send(command);
-	}, 100);
+		socket.send('pic');
+	}, 5000);
 });
 
-// wsServer.on('listening');
-// "data:image/jpeg;base64,"
-// SvelteKit should handle everything else using Express middleware
-// https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server
-app.get('/getimglist', (req, res) => {
-	let filteredFiles = [],
-		cams = new Map();
-	fs.readdir('./server/uploads/', (err, files) => {
-		if (err) throw err;
-		// files.filter((value) => value.)
-		filteredFiles = files.filter((value) =>
-			/^([0-9]*)([-]{1})([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/.test(value)
-		);
-		filteredFiles.sort((a, b) => parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]));
-		filteredFiles.forEach((value) => {
-			let mac = value.split('-')[1];
-			cams.set(mac, [...cams.get(mac), value]);
-		});
+app.get('/getcamlist', (req, res) => {
+	fs.readdir(uploadsDir, (err, dirs) => {
+		if (err) {
+			res.status(500).end();
+			throw err;
+		}
+
+		res.json(dirs);
 	});
-	res.json({
-		paths: cams
+});
+
+app.get('/getimglist', (req, res) => {
+	let result = new Map();
+	console.log(req.query.cam);
+	fs.readdir(uploadsDir, (err, dirs) => {
+		if (err) {
+			res.status(500).end();
+			throw err;
+		}
+		// console.log(files);
+		let filteredDirs = dirs;
+		if (req.query.cam) {
+			filteredDirs = filteredDirs.filter((value) => req.query.cam == value);
+		}
+
+		filteredDirs
+			.filter((value) => /^[0-9A-Fa-f]{12}$/.test(value))
+			.forEach((dir) => {
+				fs.readdir(uploadsDir + dir, (err, files) => {
+					if (err) {
+						res.status(500).end();
+						throw err;
+					}
+					result.set(
+						dir,
+						files.filter((value) => /^(\d*)\.jpg$/.test(value))
+					);
+					res.json(Object.fromEntries(result));
+				});
+			});
 	});
 });
 
 app.use(handler);
 
-server.listen(port, '192.168.50.41');
+server.listen(port, host);

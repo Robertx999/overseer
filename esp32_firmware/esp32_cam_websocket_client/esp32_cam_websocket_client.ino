@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <ArduinoWebsockets.h>
+#include <bitset>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "esp_camera.h"
@@ -9,6 +10,10 @@
 WiFiClient client;
 WiFiMulti wifiMulti;
 websockets::WebsocketsClient webSocketClient;
+
+// String address = "10.1.1.38";
+// const String address = "10.1.1.108";
+// const int wsPort = 3019;
 
 // CAMERA_MODEL_AI_THINKER
 #define PWDN_GPIO_NUM     32
@@ -44,12 +49,21 @@ void onMessageCallback(websockets::WebsocketsMessage message) {
       }
       uint8_t *fbBuf = fb->buf;
       size_t fbLen = fb->len;
-      webSocketClient.sendBinary((char *)(fbBuf), fbLen);
+      // unsigned int payload = *fbBuf;
+      // payload <<= 8;
+      // payload += 'c';
+      // payload <<= 8;
+      // payload += 'i';
+      // payload <<= 8;
+      // payload += 'p';
+      
+      // char * p = (char *)&payload;
+      webSocketClient.sendBinary((char *)fbBuf, fbLen);
       esp_camera_fb_return(fb);
     }
     if(command == "mac"){
       Serial.println(WiFi.macAddress());
-      webSocketClient.send(WiFi.macAddress());
+      webSocketClient.send("mac" + WiFi.macAddress());
     }
 }
 
@@ -113,8 +127,6 @@ void setup() {
 
   webSocketClient.onMessage(onMessageCallback);
   webSocketClient.onEvent(onEventsCallback);
-  
-  webSocketClient.connect("192.168.50.41", 3109, "/");
 
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -162,8 +174,10 @@ void setup() {
 void loop() {
   if (webSocketClient.available()) {
     webSocketClient.poll();
+    delay(1000);
   } else {
     Serial.println("Client disconnected. Reconnecting...");
-    webSocketClient.connect("192.168.50.41", 3109, "/");
+    webSocketClient.connect("", 3109, "/");
+    delay(1000);
   }
 }
