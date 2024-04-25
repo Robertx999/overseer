@@ -9,43 +9,11 @@
 
 	export let data;
 
-	let camChecked = writable(0);
+	let camChecked = writable('');
 	let selectedDate: Writable<string> = writable();
 	let filter = writable({ camChecked: $camChecked, selectedDate: $selectedDate });
 
-	function dataFromPathName(path: string) {
-		return {
-			getDate: () => {
-				return new Date(parseInt(path.split('/').at(-1) as string) * 1000);
-			},
-			getTimestamp: () => {
-				return parseInt(path.split('/').at(-1) as string) * 1000;
-			},
-			getCamNum: () => {
-				return parseInt(path.slice(path.indexOf('-cam') + 4));
-			}
-		};
-	}
-
-	let parsed_paths = data.paths
-		.map((el) => ({
-			cam_num: dataFromPathName(el).getCamNum(),
-			timestamp: dataFromPathName(el).getTimestamp(),
-			date: dataFromPathName(el).getDate(),
-			path: el
-		}))
-		.sort((a, b) => a.timestamp - b.timestamp);
-
-	let cam_nums: number[] = [];
-
-	parsed_paths.forEach((el) => {
-		if (!cam_nums.includes(el.cam_num)) {
-			cam_nums.push(el.cam_num);
-		}
-	});
-
-	let query_response: Writable<{ cam_num: number; timestamp: number; date: Date; path: string }[]> =
-		writable([]);
+	let filtered: Writable<{ mac: string; timestamp: string }[]> = writable([]);
 
 	onMount(() => {
 		camChecked.subscribe((cam) => {
@@ -56,30 +24,35 @@
 		});
 		if (document.cookie.includes('cam_checked')) {
 			camChecked.set(
-				parseInt(
-					document.cookie
-						.split('; ')
-						.filter((el) => el.split('=')[0] == 'cam_checked')[0]
-						.split('=')[1]
-				)
+				document.cookie
+					.split('; ')
+					.filter((value) => value.split('=')[0] == 'cam_checked')[0]
+					.split('=')[1]
 			);
 		}
 		if (document.cookie.includes('selected_date')) {
 			selectedDate.set(
 				document.cookie
 					.split('; ')
-					.filter((el) => el.split('=')[0] == 'selected_date')[0]
+					.filter((value) => value.split('=')[0] == 'selected_date')[0]
 					.split('=')[1]
 			);
 		}
 		filter.subscribe((filter) => {
 			document.cookie = `cam_checked=${filter.camChecked}`;
 			document.cookie = `selected_date=${filter.selectedDate}`;
-			query_response.set(
-				parsed_paths.filter(
-					(el) =>
-						el.cam_num == filter.camChecked &&
-						el.date.toDateString() == new Date(filter.selectedDate).toDateString()
+			let a: { mac: string; timestamp: string }[] = [];
+			Object.entries(data.imgDirs).forEach(([mac, imgs]) => {
+				imgs.forEach((img) => {
+					a.push({ mac: mac, timestamp: img.split('.')[0] });
+				});
+			});
+			filtered.set(
+				a.filter(
+					(value) =>
+						value.mac == filter.camChecked &&
+						new Date(parseInt(value.timestamp)).toDateString() ==
+							new Date(filter.selectedDate).toDateString()
 				)
 			);
 		});
@@ -94,7 +67,7 @@
 	<div
 		class="z-30 max-md:absolute max-md:left-1/2 max-md:top-1/2 max-md:-translate-x-1/2 max-md:-translate-y-1/2"
 	>
-		<GalleryFilter camNums={cam_nums} bind:selectedDate bind:camChecked />
+		<GalleryFilter cams={data.camList} bind:selectedDate bind:camChecked />
 	</div>
 {/if}
 
@@ -102,7 +75,7 @@
 	<div class="md:round bg-[color:var(--md-sys-color-surface-container)]">
 		<div class="flex flex-col p-6 text-xl">
 			<div>
-				{$camAliases.get($camChecked) ? $camAliases.get($camChecked) : 'Camera ' + $camChecked}
+				{$camAliases.get($camChecked) ? $camAliases.get($camChecked) : $camChecked}
 			</div>
 			{#if $selectedDate}
 				<div class="text-sm text-[color:var(--md-sys-color-outline)]">{$selectedDate}</div>
@@ -112,10 +85,23 @@
 	<div
 		class="flex min-w-full basis-1/4 flex-row flex-wrap content-start items-start justify-start gap-6 p-6"
 	>
-		{#if query_response}
-			{#each $query_response as cam}
-				<Card title={cam.date.toLocaleTimeString()} src={cam.path}></Card>
+		{#if filtered}
+			{#each $filtered as cam}
+				<Card
+					title={new Date(parseInt(cam.timestamp)).toLocaleTimeString()}
+					src={cam.mac + '/' + cam.timestamp + '.jpg'}
+				></Card>
 			{/each}
 		{/if}
+		<!-- {#if data.imgDirs}
+			{#each Object.entries(data.imgDirs) as [mac, imgs]}
+				{#each imgs as img}
+					<Card
+						title={new Date(parseInt(img.split('.')[0])).toLocaleTimeString()}
+						src={mac + '/' + img}
+					></Card>
+				{/each}
+			{/each}
+		{/if} -->
 	</div>
 </div>

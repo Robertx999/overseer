@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import { invalidate } from '$app/navigation';
 
 	import { mobileFilterOpen } from '$lib';
 
@@ -44,7 +44,7 @@
 					label="Refresh"
 					variant="primary"
 					on:click={() => {
-						history.go(0);
+						invalidate((url) => url.href.includes(currentPath));
 					}}
 					aria-label="Edit"
 					class="md:hidden"
@@ -57,7 +57,7 @@
 			<md-fab
 				variant="primary"
 				on:click={() => {
-					history.go(0);
+					invalidate((url) => url.href.includes(currentPath));
 				}}
 				aria-label="Edit"
 				class="max-md:hidden"

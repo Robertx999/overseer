@@ -5,4 +5,4 @@ import { writable, type Writable } from 'svelte/store';
 
 export let darkMode: Writable<boolean> = writable(false);
 export let mobileFilterOpen: Writable<boolean> = writable(false);
-export let camAliases: Writable<Map<number, string>> = writable(new Map());
+export let camAliases: Writable<Map<string, string>> = writable(new Map());

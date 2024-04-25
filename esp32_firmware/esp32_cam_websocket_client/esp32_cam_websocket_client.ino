@@ -40,6 +40,8 @@ void onMessageCallback(websockets::WebsocketsMessage message) {
     Serial.println(message.data());
     String command = message.data();
     if(command == "pic"){
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(1000);
       camera_fb_t * fb = NULL;
       fb = esp_camera_fb_get();
       if(!fb) {
@@ -60,6 +62,8 @@ void onMessageCallback(websockets::WebsocketsMessage message) {
       // char * p = (char *)&payload;
       webSocketClient.sendBinary((char *)fbBuf, fbLen);
       esp_camera_fb_return(fb);
+      delay(1000);
+      digitalWrite(LED_BUILTIN, LOW);
     }
     if(command == "mac"){
       Serial.println(WiFi.macAddress());
@@ -174,10 +178,10 @@ void setup() {
 void loop() {
   if (webSocketClient.available()) {
     webSocketClient.poll();
-    delay(1000);
+    delay(10000);
   } else {
     Serial.println("Client disconnected. Reconnecting...");
     webSocketClient.connect("", 3109, "/");
-    delay(1000);
+    delay(10000);
   }
 }

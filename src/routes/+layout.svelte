@@ -19,14 +19,14 @@
 	export let data;
 
 	onMount(() => {
-		if (browser) {
-			const socket = new WebSocket('ws://192.168.50.38:3109');
+		// if (browser) {
+		// 	const socket = new WebSocket('ws://192.168.50.41:3109');
 
-			socket.onmessage = ({ data }) => {
-				console.log(data);
-				// image = 'data:image/jpeg;base64,' + data;
-			};
-		}
+		// 	socket.onmessage = ({ data }) => {
+		// 		console.log(data);
+		// 		// image = 'data:image/jpeg;base64,' + data;
+		// 	};
+		// }
 		darkMode.set(
 			Boolean(
 				parseInt(
@@ -41,10 +41,11 @@
 			new Map(
 				document.cookie
 					.split('; ')
-					.filter((value) => /cam\d=.*/.test(value))
-					.map((value) => [parseInt(value.split('=')[0].at(-1) as string), value.split('=')[1]])
+					.filter((value) => /^([0-9A-Fa-f]{12})=.*$/.test(value))
+					.map((value) => [value.split('=')[0] as string, value.split('=')[1]])
 			)
 		);
+		console.log($camAliases);
 
 		darkMode.subscribe((value) => {
 			document.cookie = `dark_mode=${Number(value)}`;

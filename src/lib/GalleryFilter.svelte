@@ -9,9 +9,9 @@
 	let input: any;
 	let lastValue = '';
 
-	export let camNums: number[];
+	export let cams: string[];
 
-	export let camChecked: Writable<number>;
+	export let camChecked: Writable<string>;
 	export let selectedDate: Writable<string>;
 
 	function preventDefault(e: Event) {
@@ -23,7 +23,7 @@
 	function onCheck({ target }: Event) {
 		if (target) {
 			if ((target as HTMLInputElement).checked) {
-				camChecked.set(parseInt((target as HTMLInputElement).value));
+				camChecked.set((target as HTMLInputElement).value);
 			}
 		}
 	}
@@ -44,19 +44,17 @@
 			<h3 class="text-lg font-semibold" id="group-title">Camera</h3>
 		</div>
 
-		{#each camNums as cam_num}
+		{#each cams as cam}
 			<div class="flex gap-4">
 				<md-radio
 					on:input={onCheck}
 					id="first-radio"
 					name="group"
-					value={cam_num}
+					value={cam}
 					aria-label="First"
-					checked={$camChecked == cam_num ? true : null}
+					checked={$camChecked == cam.split('.')[0] ? true : null}
 				/>
-				<label for="first-radio"
-					>{$camAliases.get(cam_num) ? $camAliases.get(cam_num) : 'Camera ' + cam_num}</label
-				>
+				<label for="first-radio">{$camAliases.get(cam) ? $camAliases.get(cam) : cam}</label>
 			</div>
 		{/each}
 	</div>

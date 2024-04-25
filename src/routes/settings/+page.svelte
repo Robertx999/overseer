@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-
 	import { darkMode, camAliases } from '$lib';
 	import { onMount } from 'svelte';
 
@@ -11,41 +9,10 @@
 		darkMode.set(value == 'light' ? false : true);
 	}
 
-	function dataFromPathName(path: string) {
-		return {
-			getDate: () => {
-				return new Date(parseInt(path.split('/').at(-1) as string) * 1000);
-			},
-			getTimestamp: () => {
-				return parseInt(path.split('/').at(-1) as string) * 1000;
-			},
-			getCamNum: () => {
-				return parseInt(path.slice(path.indexOf('-cam') + 4));
-			}
-		};
-	}
-
-	let parsed_paths = data.paths
-		.map((el) => ({
-			cam_num: dataFromPathName(el).getCamNum(),
-			timestamp: dataFromPathName(el).getTimestamp(),
-			date: dataFromPathName(el).getDate(),
-			path: el
-		}))
-		.sort((a, b) => a.timestamp - b.timestamp);
-
-	let cam_nums: number[] = [];
-
-	parsed_paths.forEach((el) => {
-		if (!cam_nums.includes(el.cam_num)) {
-			cam_nums.push(el.cam_num);
-		}
-	});
-
 	onMount(() => {
 		camAliases.subscribe((map) => {
 			map.forEach((value, key) => {
-				document.cookie = `cam${key}=${value}`;
+				document.cookie = `${key}=${value}`;
 			});
 		});
 	});
@@ -69,15 +36,15 @@
 		</md-outlined-select>
 	</div>
 	<h1 class="text-sm font-bold text-[color:var(--md-sys-color-primary)]">Cameras</h1>
-	{#each cam_nums as cam_num}
+	{#each data.cams as cam}
 		<div class="flex flex-row items-center gap-4">
 			<md-outlined-text-field
-				label="Camera {cam_num} alias"
+				label="{cam} alias"
 				on:input={({ target }) => {
-					$camAliases.set(cam_num, target.value);
+					$camAliases.set(cam, target.value);
 					camAliases.update((n) => n);
 				}}
-				value={$camAliases.get(cam_num) ? $camAliases.get(cam_num) : ''}
+				value={$camAliases.get(cam) ? $camAliases.get(cam) : ''}
 			>
 			</md-outlined-text-field>
 		</div>

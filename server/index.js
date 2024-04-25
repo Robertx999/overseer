@@ -1,14 +1,19 @@
 import express from 'express';
-import { createServer } from 'node:http';
+import { createServer } from 'node:https';
 import { WebSocketServer } from 'ws';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { handler } from '../build/handler.js';
 
 ////////////////////////// CONFIG //////////////////////////
 const host = '';
-const port = 80;
+const port = 81;
 const ws_port = 3109;
 const uploadsDir = './server/uploads/';
+
+// const options = {
+// 	key:
+// }
 ////////////////////////////////////////////////////////////
 
 const app = express();
@@ -19,22 +24,14 @@ const wsServer = new WebSocketServer({ port: ws_port });
 wsServer.on('connection', (socket, req) => {
 	let mac = '';
 	socket.on('message', (message) => {
-		// socket.send(message);
 		let header = message.slice(0, 3).toString();
 		if (header == 'mac') {
-			// console.log(req.socket.remoteAddress);
-			// console.log(message.toString());
 			mac = message.slice(3).toString();
 			console.log(mac);
-		} else if (/^[0-9A-Fa-f]{12}$/.test(mac)) {
-			// console.log(message.slice(3, 20));
-			let dirPath = uploadsDir + mac.replaceAll(':', '');
-			fs.stat(dirPath, (err, stats) => {
-				if (!stats.isDirectory()) {
-					fs.mkdir(dirPath, (err) => {
-						if (err) throw err;
-					});
-				}
+		} else if (/^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/.test(mac)) {
+			let dirPath = uploadsDir + mac.replaceAll(':', '') + '/';
+			fs.mkdir(dirPath, { recursive: true }, (err) => {
+				if (err) throw err;
 			});
 			fs.writeFile(
 				dirPath + '/' + Date.now() + '.jpg',
@@ -42,7 +39,7 @@ wsServer.on('connection', (socket, req) => {
 				{ encoding: 'binary', flag: 'w' },
 				(err) => {
 					if (err) throw err;
-					console.log('File saved.');
+					// console.log('File saved.');
 				}
 			);
 		} else {
@@ -50,54 +47,66 @@ wsServer.on('connection', (socket, req) => {
 		}
 	});
 	socket.send('mac');
+	socket.send('pic');
 	setInterval(() => {
 		socket.send('pic');
-	}, 5000);
+	}, 60 * 1000);
 });
 
-app.get('/getcamlist', (req, res) => {
-	fs.readdir(uploadsDir, (err, dirs) => {
-		if (err) {
-			res.status(500).end();
-			throw err;
-		}
-
-		res.json(dirs);
-	});
+app.get('/getcamlist', async (req, res) => {
+	await fs.mkdir(uploadsDir, { recursive: true });
+	res.json(await fs.readdir(uploadsDir));
 });
 
-app.get('/getimglist', (req, res) => {
-	let result = new Map();
-	console.log(req.query.cam);
-	fs.readdir(uploadsDir, (err, dirs) => {
-		if (err) {
-			res.status(500).end();
-			throw err;
-		}
-		// console.log(files);
-		let filteredDirs = dirs;
-		if (req.query.cam) {
-			filteredDirs = filteredDirs.filter((value) => req.query.cam == value);
-		}
+app.get('/getimglist', async (req, res) => {
+	// let result = new Map();
+	await fs.mkdir(uploadsDir, { recursive: true });
+	let result = new Map(
+		Object.entries(
+			(
+				await Promise.all(
+					(await fs.readdir(uploadsDir))
+						.filter(
+							(value) =>
+								/^[0-9A-Fa-f]{12}$/.test(value) &&
+								(/^([0-9A-Fa-f]{12};)*([0-9A-Fa-f]{12})$/.test(req.query.cam)
+									? (req.query.cam.split(';') || []).includes(value)
+									: true)
+						)
+						// let filteredDirs = dirs;
+						// if (/^([0-9A-Fa-f]{12};)*([0-9A-Fa-f]{12})$/.test(req.query.cam)) {
+						// 	let macs = req.query.cam.split(';') || [];
+						// 	filteredDirs = filteredDirs.filter((value) => macs.includes(value));
+						// }
 
-		filteredDirs
-			.filter((value) => /^[0-9A-Fa-f]{12}$/.test(value))
-			.forEach((dir) => {
-				fs.readdir(uploadsDir + dir, (err, files) => {
-					if (err) {
-						res.status(500).end();
-						throw err;
-					}
-					result.set(
-						dir,
-						files.filter((value) => /^(\d*)\.jpg$/.test(value))
-					);
-					res.json(Object.fromEntries(result));
-				});
-			});
-	});
+						// filteredDirs
+						//	.filter((value) => /^[0-9A-Fa-f]{12}$/.test(value))
+						.map(async (dir) => {
+							let files = {};
+							files[dir] = await fs.readdir(uploadsDir + dir);
+							return files;
+						})
+				)
+			).reduce((prev, curr) => Object.assign(prev, curr), {})
+		)
+	);
+	if (req.query.newest == 'true') {
+		result.forEach((value, key, map) => {
+			map.set(
+				key,
+				value.reduce((prev, curr) =>
+					parseInt(path.basename(prev)) < parseInt(path.basename(curr)) ? curr : prev
+				)
+			);
+		});
+	}
+	res.json(Object.fromEntries(result));
 });
+
+app.use(express.static(uploadsDir));
 
 app.use(handler);
 
-server.listen(port, host);
+app.listen(port, host, () => {
+	console.log('Listening on ' + host + ':' + port);
+});

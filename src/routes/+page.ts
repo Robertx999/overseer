@@ -1,25 +1,27 @@
 export async function load({
-	fetch
+	fetch,
+	url
 }: {
 	fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
+	url: URL;
 }) {
-	let json: {};
 	// if (!import.meta.env.DEV) {
-	const res = await fetch('/getimglist');
-	json = {};
+	let json: Record<string, string> = {};
+	const res = await fetch('/getimglist?newest=true');
 	await res
 		.json()
 		.then((result) => {
 			json = result;
 		})
 		.catch((error) => console.error(error));
-
 	return {
-		paths: json
+		imgDirs: json
 	};
 	// } else {
 	// 	return {
-	// 		paths: ['uploads/1713031695-cam4', 'uploads/1713084324-cam3']
+	// 		imgDirs: {
+	// 			'94B97EF9EA50': '1713718023947.jpg'
+	// 		}
 	// 	};
 	// }
 }

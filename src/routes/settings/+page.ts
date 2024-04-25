@@ -1,25 +1,27 @@
 export async function load({
-	fetch
+	fetch,
+	url
 }: {
 	fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
+	url: URL;
 }) {
-	let json: { status: string; paths: [] };
-	if (!import.meta.env.DEV) {
-		const res = await fetch('/getimglist.php');
-		json = { status: '', paths: [] };
-		await res
-			.json()
-			.then((result) => {
-				json = result;
-			})
-			.catch((error) => console.error(error));
+	// let json: { status: string; paths: [] };
+	// if (!import.meta.env.DEV) {
+	const res = await fetch('/getcamlist');
+	let json: string[] = [];
+	await res
+		.json()
+		.then((result) => {
+			json = result;
+		})
+		.catch((error) => console.error(error));
 
-		return {
-			paths: json.paths || []
-		};
-	} else {
-		return {
-			paths: ['uploads/1713031695-cam4', 'uploads/1713084324-cam3']
-		};
-	}
+	return {
+		cams: json || []
+	};
+	// } else {
+	// 	return {
+	// 		cams: ['94B97EF9EA50']
+	// 	};
+	// }
 }
