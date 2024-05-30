@@ -1,13 +1,30 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	export let src: string | undefined = undefined;
 	export let title = '';
+
+	let loaded: boolean = false;
+	$: console.log(loaded);
 </script>
 
 <div
-	class="relative flex flex-col overflow-hidden rounded-2xl bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)] md:min-w-80 md:max-w-96"
+	class="relative flex min-w-full flex-1 flex-col overflow-hidden rounded-2xl bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)] md:min-w-[25rem] md:max-w-[50rem]"
 >
 	{#if src != undefined}
-		<img {src} alt="" class="overflow-hidden object-cover" />
+		<div class=" relative aspect-[5/4]">
+			<img
+				{src}
+				alt=""
+				class="{loaded ? 'visible' : 'collapse'} absolute overflow-hidden object-cover"
+				on:load={() => (loaded = true)}
+			/>
+			{#if !loaded}
+				<div
+					class="h-full w-full animate-pulse rounded-sm bg-[color:var(--md-sys-color-outline-variant)] p-5"
+				></div>
+			{/if}
+		</div>
 	{/if}
 	<div class="absolute bottom-0 flex w-full flex-row items-end justify-between gap-2 p-6">
 		<div

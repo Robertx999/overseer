@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-
 	import '../app.pcss';
 
 	import { fly, fade } from 'svelte/transition';
@@ -19,14 +17,6 @@
 	export let data;
 
 	onMount(() => {
-		// if (browser) {
-		// 	const socket = new WebSocket('ws://192.168.50.41:3109');
-
-		// 	socket.onmessage = ({ data }) => {
-		// 		console.log(data);
-		// 		// image = 'data:image/jpeg;base64,' + data;
-		// 	};
-		// }
 		darkMode.set(
 			Boolean(
 				parseInt(
@@ -45,7 +35,6 @@
 					.map((value) => [value.split('=')[0] as string, value.split('=')[1]])
 			)
 		);
-		console.log($camAliases);
 
 		darkMode.subscribe((value) => {
 			document.cookie = `dark_mode=${Number(value)}`;

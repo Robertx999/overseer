@@ -1,8 +1,15 @@
 <script lang="ts">
-	import { darkMode, camAliases } from '$lib';
-	import { onMount } from 'svelte';
+	import { darkMode, camAliases, type CamerasRecordModel } from '$lib';
+	import { onDestroy, onMount } from 'svelte';
+	import PocketBase from 'pocketbase';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let data;
+
+	let cameras: Writable<CamerasRecordModel[]> = writable(data.cameras);
+
+	const pbOrigin = 'http://10.1.1.38:9000';
+	const pb = new PocketBase(pbOrigin);
 
 	function switchDarkMode(e: Event) {
 		let { value } = e.target as unknown as { value: string };
@@ -15,6 +22,26 @@
 				document.cookie = `${key}=${value}`;
 			});
 		});
+		pb.collection('cameras').subscribe('*', async () => {
+			let list: CamerasRecordModel[] = await pb
+				.collection('cameras')
+				.getFullList()
+				.then((res) => {
+					return res as CamerasRecordModel[];
+				})
+				.catch((error) => {
+					console.log(error);
+					return [];
+				});
+			cameras.update(() => list);
+		});
+		cameras.subscribe((value) => {
+			console.log(value);
+		});
+	});
+
+	onDestroy(() => {
+		pb.collection('cameras').unsubscribe();
 	});
 </script>
 
@@ -36,15 +63,18 @@
 		</md-outlined-select>
 	</div>
 	<h1 class="text-sm font-bold text-[color:var(--md-sys-color-primary)]">Cameras</h1>
-	{#each data.cams as cam}
+	{#each $cameras as camera}
 		<div class="flex flex-row items-center gap-4">
 			<md-outlined-text-field
-				label="{cam} alias"
-				on:input={({ target }) => {
-					$camAliases.set(cam, target.value);
+				label="{camera.mac} alias"
+				on:input={({
+					//@ts-ignore
+					target
+				}) => {
+					$camAliases.set(camera.mac, target.value);
 					camAliases.update((n) => n);
 				}}
-				value={$camAliases.get(cam) ? $camAliases.get(cam) : ''}
+				value={$camAliases.get(camera.mac) ? $camAliases.get(camera.mac) : ''}
 			>
 			</md-outlined-text-field>
 		</div>

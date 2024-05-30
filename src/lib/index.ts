@@ -1,8 +1,32 @@
 // place files you want to import through the `$lib` alias in this folder.
 
-import { onMount } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
+import type PocketBase from 'pocketbase';
+import type { ListResult, RecordModel, RecordSubscription } from 'pocketbase';
 
 export let darkMode: Writable<boolean> = writable(false);
 export let mobileFilterOpen: Writable<boolean> = writable(false);
 export let camAliases: Writable<Map<string, string>> = writable(new Map());
+
+export interface ImageViewRecordModel extends RecordModel {
+	camera_mac: string;
+	unix_timestamp: number;
+	image: any;
+}
+
+export interface CamerasRecordModel extends RecordModel {
+	mac: string;
+	online: boolean;
+}
+
+// export interface ImagesRecordModel extends RecordModel {
+// 	camera_id: string;
+// 	unix_timestamp: number;
+// 	image: any;
+// }
+
+// export type ImagesRecordSubscription = RecordSubscription<ImagesRecordModel>;
+
+// export type ImageViewRecordSubscription = RecordSubscription<ImageViewRecordModel>;
+
+// export type ImageViewListResult = ListResult<ImageViewRecordModel>;

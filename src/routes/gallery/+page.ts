@@ -7,25 +7,27 @@ export async function load({
 }) {
 	// if (!import.meta.env.DEV) {
 	let imgJson: Record<string, string[]> = {};
-	const imgRes = await fetch('/getimglist');
-	await imgRes
-		.json()
-		.then((result) => {
-			imgJson = result;
-		})
-		.catch((error) => console.error(error));
-
 	let camJson: string[] = [];
-	const camRes = await fetch('/getcamlist');
-	await camRes
-		.json()
-		.then((result) => {
-			camJson = result;
-		})
-		.catch((error) => console.error(error));
+
+	// const imgRes = await fetch('/getimglist');
+	// await imgRes
+	// 	.json()
+	// 	.then((result) => {
+	// 		imgJson = result;
+	// 	})
+	// 	.catch(() => console.error('fetch failed'));
+
+	// const camRes = await fetch('/getcamlist');
+	// await camRes
+	// 	.json()
+	// 	.then((result) => {
+	// 		camJson = result;
+	// 	})
+	// 	.catch(() => console.error('fetch failed'));
+
 	return {
-		imgDirs: imgJson,
-		camList: camJson
+		imgDirs: imgJson || {},
+		camList: camJson || []
 	};
 	// } else {
 	// 	return {
