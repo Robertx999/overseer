@@ -84,7 +84,7 @@
 				</div>
 				<span class=" text-xs font-medium leading-4 tracking-widest">Home</span>
 			</a>
-			<a
+			<!-- <a
 				href="/gallery"
 				class="destination flex h-14 w-full max-w-[88px] flex-col items-center justify-start gap-1 {currentPath ==
 				'/gallery'
@@ -101,7 +101,7 @@
 					<md-icon class="z-10 {currentPath == '/gallery' ? 'filled' : 'empty'}"> image </md-icon>
 				</div>
 				<span class=" text-xs font-medium leading-4 tracking-widest">Gallery</span>
-			</a>
+			</a> -->
 			<a
 				href="/settings"
 				class="destination flex h-14 w-full max-w-[88px] flex-col items-center justify-start gap-1 {currentPath ==

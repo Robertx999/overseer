@@ -13,3 +13,4 @@ vite.config.ts.timestamp-*
 php.exe
 php8.dll
 *.7z
+/esp32_firmware/esp32_cam_websocket_client/env.h

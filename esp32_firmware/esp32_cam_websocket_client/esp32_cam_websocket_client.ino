@@ -6,6 +6,7 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "esp_camera.h"
+#include "./env.h"
 
 WiFiClient client;
 WiFiMulti wifiMulti;
@@ -93,10 +94,10 @@ void setup() {
   WiFi.mode(WIFI_STA);
   
   // Add list of wifi networks
-  wifiMulti.addAP("ACR", "1a4df50c96");
-  wifiMulti.addAP("Acr-corridor", "1a4df50c96");
-  wifiMulti.addAP("AcrylplastSerwerownia", "1a4df50c96");
-  wifiMulti.addAP("ASUS_HAUS", "1a4df50c96");
+  wifiMulti.addAP(SSID1, PASSWD);
+  wifiMulti.addAP(SSID2, PASSWD);
+  wifiMulti.addAP(SSID3, PASSWD);
+  wifiMulti.addAP(SSID4, PASSWD);
 
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();
@@ -184,7 +185,7 @@ void loop() {
     delay(10000);
   } else {
     Serial.println("Client disconnected. Reconnecting...");
-    webSocketClient.connect("10.1.1.38", 3109, "/");
+    webSocketClient.connect(WEBSOCKET_SERVER_IP, WEBSOCKET_PORT, "/");
     delay(10000);
   }
 }

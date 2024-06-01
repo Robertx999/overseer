@@ -1,33 +1,18 @@
-export async function load({
-	fetch,
-	url
-}: {
-	fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
-	url: URL;
-}) {
-	// if (!import.meta.env.DEV) {
-	let imgJson: Record<string, string[]> = {};
-	let camJson: string[] = [];
+import type { PageLoad } from '../$types';
 
-	// const imgRes = await fetch('/getimglist');
-	// await imgRes
-	// 	.json()
-	// 	.then((result) => {
-	// 		imgJson = result;
-	// 	})
-	// 	.catch(() => console.error('fetch failed'));
-
-	// const camRes = await fetch('/getcamlist');
-	// await camRes
-	// 	.json()
-	// 	.then((result) => {
-	// 		camJson = result;
-	// 	})
-	// 	.catch(() => console.error('fetch failed'));
+export const load: PageLoad = async ({ fetch }) => {
+	const { items: cameras } = await (await fetch(`/api/collections/cameras/records?perPage=500`))
+		.json()
+		.then((res) => res);
+	const { items: images } = await (
+		await fetch(`/api/collections/images/records?sort=-unix_timestamp&perPage=500`)
+	)
+		.json()
+		.then((res) => res);
 
 	return {
-		imgDirs: imgJson || {},
-		camList: camJson || []
+		imgDirs: images || {},
+		camList: cameras || []
 	};
 	// } else {
 	// 	return {
@@ -102,4 +87,4 @@ export async function load({
 	// 		camList: ['94B97EF9EA50']
 	// 	};
 	// }
-}
+};

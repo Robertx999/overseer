@@ -18,15 +18,3 @@ export interface CamerasRecordModel extends RecordModel {
 	mac: string;
 	online: boolean;
 }
-
-// export interface ImagesRecordModel extends RecordModel {
-// 	camera_id: string;
-// 	unix_timestamp: number;
-// 	image: any;
-// }
-
-// export type ImagesRecordSubscription = RecordSubscription<ImagesRecordModel>;
-
-// export type ImageViewRecordSubscription = RecordSubscription<ImageViewRecordModel>;
-
-// export type ImageViewListResult = ListResult<ImageViewRecordModel>;
