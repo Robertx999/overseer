@@ -3,14 +3,10 @@ node_modules
 /build
 /.svelte-kit
 /package
-/static/*/
-/server/uploads
 .env
 .env.*
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-php.exe
-php8.dll
 *.7z
 /esp32_firmware/esp32_cam_websocket_client/env.h
