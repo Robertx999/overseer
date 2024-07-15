@@ -59,7 +59,7 @@
 
 <div class="flex h-full w-full flex-col-reverse md:flex-row">
 	<div
-		class="flex flex-none flex-row py-2 max-md:h-14 max-md:border-t-[1px] md:w-14 md:flex-col md:border-r-[1px]"
+		class="flex w-full flex-none flex-row py-2 max-md:h-14 max-md:border-t-[1px] md:w-14 md:flex-col md:border-r-[1px]"
 	>
 		<!-- logo -->
 		<div class="flex h-full w-14 items-center justify-center max-md:hidden md:h-14 md:w-full">
@@ -118,12 +118,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex grow flex-col bg-[hsl(var(--muted)/.4)] pt-7">
+	<div class="flex w-full flex-col overflow-hidden bg-[hsl(var(--muted)/.4)]">
 		<!-- title bar -->
 		<!-- <div class="flex h-14 w-full flex-none items-center border-b-[1px] px-4 text-xl font-bold">
 			{routes.find((value) => $page.url.pathname == value.href)?.name}
 		</div> -->
-		<div class="flex w-full flex-none items-center px-4 pl-7 text-xl font-bold">
+		<div class="flex w-full flex-none items-center py-7 pl-7 text-xl font-bold">
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
 					{#each $breadcrumbs as { name, href }, index}
@@ -138,7 +138,7 @@
 			</Breadcrumb.Root>
 		</div>
 		<!-- content -->
-		<div class="h-0 grow overflow-y-scroll p-7">
+		<div class="flex grow">
 			<slot></slot>
 		</div>
 	</div>

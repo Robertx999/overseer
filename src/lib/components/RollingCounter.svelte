@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 
-	export let numberString: string, Class: string;
+	export let numberString: string;
 
 	let scrolls: HTMLDivElement[] = [],
 		wrapper: HTMLDivElement,
@@ -30,9 +30,9 @@
 	});
 </script>
 
-<div class="relative transition-[width]" style="height: {height}px;" bind:this={wrapper}>
+<div class="relative transition-[width]" style:height="{height}px" bind:this={wrapper}>
 	<div
-		class="gradient-mask absolute flex flex-row flex-nowrap {Class}"
+		class="gradient-mask absolute flex flex-row flex-nowrap {$$restProps.class || ''}"
 		bind:clientWidth={$inner_width}
 		bind:clientHeight={height}
 	>
