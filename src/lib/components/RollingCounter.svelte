@@ -4,11 +4,9 @@
 
 	export let numberString: string;
 
-	let scrolls: HTMLDivElement[] = [],
-		wrapper: HTMLDivElement,
-		height = 0;
+	let scrolls: HTMLDivElement[] = [];
 
-	const inner_width: Writable<number> = writable(0),
+	const inner_width: Writable<number> = writable(80),
 		chars = writable(['']);
 
 	$: chars.set(numberString.split(''));
@@ -24,17 +22,16 @@
 				});
 			}
 		});
-		inner_width.subscribe((width) => {
-			wrapper.style.width = `${width}px`;
-		});
 	});
 </script>
 
-<div class="relative transition-[width]" style:height="{height}px" bind:this={wrapper}>
+<div
+	class="relative h-[1lh] transition-[width] {$$restProps.class || ''}"
+	style:width="{$inner_width}px"
+>
 	<div
-		class="gradient-mask absolute flex flex-row flex-nowrap {$$restProps.class || ''}"
+		class="gradient-mask absolute flex h-[1lh] flex-row flex-nowrap"
 		bind:clientWidth={$inner_width}
-		bind:clientHeight={height}
 	>
 		{#each $chars as char, index}
 			{#if Number.isNaN(Number.parseInt(char))}

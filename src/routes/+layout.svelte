@@ -10,16 +10,18 @@
 	import { onMount } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import { writable, type Writable } from 'svelte/store';
+	import { document } from 'postcss';
 
 	export const darkModeEnabled = writable(true);
 	const darkMode: Action = (node) => {
-		darkModeEnabled.subscribe((value) => node.setAttribute('data-mode', value ? 'dark' : ''));
-	};
+			darkModeEnabled.subscribe((value) => node.setAttribute('data-mode', value ? 'dark' : ''));
+		},
+		pageWidth = writable(1000);
 
 	export const routes: { name: string; href: string; icon: typeof Home }[] = [
 		{
-			name: 'Home',
-			href: '/home',
+			name: 'Dashboard',
+			href: '/dashboard',
 			icon: Home
 		},
 		{
@@ -40,6 +42,7 @@
 	];
 
 	const breadcrumbs: Writable<{ name: string; href: string }[]> = writable([]);
+	let widths: Writable<number[]> = writable([]);
 	onMount(() => {
 		page.subscribe((value) => {
 			breadcrumbs.update(() => {
@@ -55,11 +58,12 @@
 	});
 </script>
 
+<svelte:window bind:innerWidth={$pageWidth} />
 <svelte:body use:darkMode />
 
 <div class="flex h-full w-full flex-col-reverse md:flex-row">
 	<div
-		class="flex w-full flex-none flex-row py-2 max-md:h-14 max-md:border-t-[1px] md:w-14 md:flex-col md:border-r-[1px]"
+		class="flex w-full flex-none flex-row max-md:h-fit max-md:border-t-[1px] md:w-14 md:flex-col md:border-r-[1px] md:py-2"
 	>
 		<!-- logo -->
 		<div class="flex h-full w-14 items-center justify-center max-md:hidden md:h-14 md:w-full">
@@ -80,17 +84,29 @@
 		<!-- nav bar -->
 		<div class="flex grow flex-row md:flex-col md:justify-between">
 			<!-- top -->
-			<div class="flex w-full flex-row justify-around gap-1 p-2 max-md:h-full md:flex-col">
-				{#each routes as { name, href, icon }}
+			<div class="flex w-full flex-row justify-around gap-1 p-2 max-md:h-fit md:flex-col">
+				{#each routes as { name, href, icon }, index}
 					<Tooltip.Root>
 						<Tooltip.Trigger asChild let:builder>
 							<Button
 								builders={[builder]}
 								{href}
+								class="transition-[background]"
 								variant={$page.url.pathname == href ? 'secondary' : 'ghost'}
-								size="icon"
+								size={$pageWidth > 768 ? 'icon' : undefined}
 							>
-								<svelte:component this={icon} size={22} />
+								<div
+									class="flex justify-center overflow-hidden transition-[width]"
+									style:width="{$widths[index]}px"
+								>
+									<div bind:clientWidth={$widths[index]} class=" w-fit">
+										{#if $pageWidth > 768 || $page.url.pathname != href}
+											<svelte:component this={icon} size={22} />
+										{:else}
+											{name}
+										{/if}
+									</div>
+								</div>
 							</Button>
 						</Tooltip.Trigger>
 						<Tooltip.Content side="right">
@@ -118,7 +134,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex w-full flex-col overflow-hidden bg-[hsl(var(--muted)/.4)]">
+	<div class="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--muted)/.4)]">
 		<!-- title bar -->
 		<!-- <div class="flex h-14 w-full flex-none items-center border-b-[1px] px-4 text-xl font-bold">
 			{routes.find((value) => $page.url.pathname == value.href)?.name}

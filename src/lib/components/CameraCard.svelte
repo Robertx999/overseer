@@ -3,15 +3,17 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { Terminal, Settings } from 'lucide-svelte';
+	import { ExternalLink } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import RollingCounter from './RollingCounter.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { AspectRatio } from './ui/aspect-ratio';
 	import Chart from '$lib/components/Chart.svelte';
 	import { Skeleton } from './ui/skeleton';
+	import * as Tooltip from './ui/tooltip';
 
-	export let skeleton: boolean = false;
+	export let skeleton: boolean = false,
+		cameraId: string = '';
 	let online = writable(Math.round(Math.random()));
 
 	const time: Writable<string> = writable('14:40'),
@@ -19,7 +21,10 @@
 		volume: Writable<number> = writable(0),
 		delta_volume = writable(0),
 		data_arr = writable(
-			Array.from({ length: 10 }, (_) => Math.trunc(Math.random() * 900) / 100 + 1)
+			Array.from({ length: 10 }, () => ({
+				value: Math.trunc(Math.random() * 900) / 100 + 1,
+				date: new Date(new Date(Date.now()))
+			}))
 		);
 	onMount(() => {
 		setInterval(() => {
@@ -33,17 +38,22 @@
 						.padStart(2, '0')
 			);
 			relative.set(
-				new Intl.RelativeTimeFormat(navigator.languages[0], { style: 'narrow' }).format(
-					-Math.trunc(Math.random() * 10),
-					'day'
+				Array.from(
+					new Intl.RelativeTimeFormat(navigator.languages[0], {
+						style: 'narrow',
+						numeric: 'auto'
+					}).format(-Math.trunc(Math.random() * 10), 'day')
 				)
+					.map((value, index) => (index == 0 ? value.toUpperCase() : value))
+					.join('')
 			);
 			volume.set(Math.trunc(Math.random() * 999999) / 1000);
 			delta_volume.set(Math.trunc(Math.random() * 12000) / 1000);
 			data_arr.update((array) =>
-				array.map((value) =>
-					Math.abs(Math.min(value + Math.trunc((Math.random() - 0.5) * 60) / 10, 10))
-				)
+				array.map((el) => ({
+					value: Math.abs(Math.min(el.value + Math.trunc((Math.random() - 0.5) * 60) / 10, 10)),
+					date: new Date(Date.now())
+				}))
 			);
 			online.update((value) => Math.round(Math.random()));
 		}, 500);
@@ -55,7 +65,7 @@
 		''}"
 >
 	<Card.Header class="bg-[hsl(var(--muted)/.5)]">
-		<div class=" flex flex-row flex-nowrap items-center justify-between gap-10">
+		<div class=" flex flex-row flex-nowrap items-center justify-between gap-2 md:gap-20">
 			<div class="flex flex-col flex-nowrap">
 				{#if skeleton}
 					<Skeleton class="mb-3 h-5 w-16" />
@@ -76,12 +86,21 @@
 					<Badge class="flex h-min w-16 justify-center bg-red-700">Offline</Badge>
 				{/if}
 				<div class="flex flex-row gap-1">
-					<Button variant="outline" size="icon">
-						<Terminal size="16" />
-					</Button>
-					<Button variant="outline" size="icon">
-						<Settings size="16" />
-					</Button>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild let:builder>
+							<Button
+								builders={[builder]}
+								href="/dashboard/{cameraId}"
+								variant="outline"
+								size="icon"
+							>
+								<ExternalLink size="16" />
+							</Button>
+						</Tooltip.Trigger>
+						<Tooltip.Content>
+							<p>Open Camera View</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
 				</div>
 			</div>
 		</div>
@@ -106,7 +125,7 @@
 				</div>
 			</div>
 			<Separator orientation="vertical" class="h-auto" />
-			<div class="flex h-32 items-center px-6 py-9">
+			<div class="flex h-32 items-center px-2 py-9">
 				<div class="">
 					<div class="text-xs text-[hsl(var(--muted-foreground)/var(--tw-text-opacity))]">
 						Volume
@@ -139,6 +158,10 @@
 			{/if}
 		</AspectRatio>
 		<Separator class="my-6 -ml-6 w-[calc(100%+3rem)]" />
-		<Chart data={skeleton ? Array.from({ length: 10 }, (_) => 0) : $data_arr} />
+		<Chart
+			data={skeleton
+				? Array.from({ length: 10 }, () => ({ value: 0, date: new Date(Date.now()) }))
+				: $data_arr}
+		/>
 	</Card.Content>
 </Card.Root>
