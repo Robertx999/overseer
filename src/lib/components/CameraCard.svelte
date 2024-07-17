@@ -3,7 +3,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { ExternalLink } from 'lucide-svelte';
+	import { ExternalLink, TrendingUp } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import RollingCounter from './RollingCounter.svelte';
 	import { writable, type Writable } from 'svelte/store';
@@ -21,9 +21,9 @@
 		volume: Writable<number> = writable(0),
 		delta_volume = writable(0),
 		data_arr = writable(
-			Array.from({ length: 10 }, () => ({
+			Array.from({ length: 10 }, (_, index) => ({
 				value: Math.trunc(Math.random() * 900) / 100 + 1,
-				date: new Date(new Date(Date.now()))
+				date: new Date(Date.now() - index * 1000 * 60 * 60 * 24 * 30.437)
 			}))
 		);
 	onMount(() => {
@@ -39,7 +39,7 @@
 			);
 			relative.set(
 				Array.from(
-					new Intl.RelativeTimeFormat(navigator.languages[0], {
+					new Intl.RelativeTimeFormat(navigator?.language, {
 						style: 'narrow',
 						numeric: 'auto'
 					}).format(-Math.trunc(Math.random() * 10), 'day')
@@ -50,13 +50,13 @@
 			volume.set(Math.trunc(Math.random() * 999999) / 1000);
 			delta_volume.set(Math.trunc(Math.random() * 12000) / 1000);
 			data_arr.update((array) =>
-				array.map((el) => ({
-					value: Math.abs(Math.min(el.value + Math.trunc((Math.random() - 0.5) * 60) / 10, 10)),
-					date: new Date(Date.now())
+				array.map((el, index) => ({
+					value: Math.abs(Math.min(el.value + Math.trunc((Math.random() - 0.5) * 60) / 10, 200)),
+					date: new Date(Date.now() - index * 1000 * 60 * 60 * 24 * 30.437)
 				}))
 			);
 			online.update((value) => Math.round(Math.random()));
-		}, 500);
+		}, 4000);
 	});
 </script>
 
@@ -135,11 +135,9 @@
 						<Skeleton class="my-1 h-5 w-16" />
 					{:else}
 						<RollingCounter numberString={$volume.toFixed(3)} class="text-3xl font-bold" />
-						<div class="flex flex-row flex-nowrap text-base font-bold">
-							+<RollingCounter
-								numberString={$delta_volume.toFixed(3)}
-								class="text-base font-bold"
-							/>
+						<div class="flex flex-row flex-nowrap items-center gap-2 text-base font-bold">
+							<TrendingUp size="16" />
+							<RollingCounter numberString={$delta_volume.toFixed(3)} class="text-base font-bold" />
 						</div>
 					{/if}
 				</div>
@@ -159,8 +157,9 @@
 		</AspectRatio>
 		<Separator class="my-6 -ml-6 w-[calc(100%+3rem)]" />
 		<Chart
+			period="y"
 			data={skeleton
-				? Array.from({ length: 10 }, () => ({ value: 0, date: new Date(Date.now()) }))
+				? Array.from({ length: 1 }, () => ({ value: 0, date: new Date(Date.now()) }))
 				: $data_arr}
 		/>
 	</Card.Content>

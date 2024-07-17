@@ -39,18 +39,16 @@
 <div
 	class="flex w-full grow items-center overflow-x-scroll max-md:scroll-smooth"
 	bind:this={scrollable}
-	on:scroll={() => {
+	on:scroll|preventDefault={() => {
 		if (snapTimer != undefined) {
 			clearTimeout(snapTimer);
 		}
 		snapTimer = setTimeout(() => {
 			let temp = cardPositions.map((pos) => Math.abs(pos - scrollable.scrollLeft));
-			if ($pageWidth > 768) {
-				scroll.set(cardPositions[temp.indexOf(Math.min(...temp))]);
-			} else {
+			if ($pageWidth <= 768) {
 				scrollable.scrollLeft = cardPositions[temp.indexOf(Math.min(...temp))];
 			}
-		}, 300);
+		}, 100);
 	}}
 	on:wheel={(event) => {
 		if ($pageWidth > 768) {

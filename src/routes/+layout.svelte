@@ -10,7 +10,6 @@
 	import { onMount } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import { writable, type Writable } from 'svelte/store';
-	import { document } from 'postcss';
 
 	export const darkModeEnabled = writable(true);
 	const darkMode: Action = (node) => {
